@@ -1,0 +1,97 @@
+ctmc
+
+const int N = 20;
+const int left_mx = N;
+const int right_mx = N;
+const int init_N = 10;
+const int k = floor (0.75*N);
+const int l = floor (1.25*N);
+const double switch_fail = 1/4000;
+const double line_fail = 1/5000;
+const double switch_check = 10;
+const double line_check = 10;
+
+formula minimum = ( left_n>=k&toleft_n=1 )|( right_n>=k&toright_n=1 )|( ( left_n+right_n )>=k&toleft_n=1&line_n=1&toright_n=1 );
+
+module Left
+	left_n:[0..left_mx] init 10;
+	left:[0..1] init 0;
+
+	[startLeft]	left = 0&( left_n<left_mx ) -> 1:(left' = 1);
+	[repairLeft]	left = 1&( left_n<left_mx ) -> 1:(left' = 0) & (left_n' = left_n+1);
+	[]	(left_n > 0) -> ws_fail*left_n:(left_n' = left_n-1);
+endmodule 
+
+
+module Right
+	right_n:[0..right_mx] init 10;
+	right:[0..1] init 0;
+
+	[startRight]	left = 0&( right_n<right_mx ) -> 1:(right' = 1);
+	[repairRight]	left = 1&( right_n<right_mx ) -> 1:(right' = 0) & (right_n' = right_n+1);
+	[]	(right_n > 0) -> ws_fail*right_n:(right_n' = right_n-1);
+endmodule 
+
+
+module Repairman
+	r:[0..1] init 0;
+
+	[startLeft]	r = 0 -> ws_check:(r' = 1);
+	[startRight]	r = 0 -> ws_check:(r' = 1);
+	[startToLeft]	r = 0 -> switch_check:(r' = 1);
+	[startToRight]	r = 0 -> switch_check:(r' = 1);
+	[startLine]	r = 0 -> ws_check:(r' = 1);
+	[repairLeft]	r = 1 -> ws_repair:(r' = 0);
+	[repairRight]	r = 1 -> ws_repair:(r' = 0);
+	[repairToLeft]	r = 1 -> 0.25:(r' = 0);
+	[repairToRight]	r = 1 -> 0.25:(r' = 0);
+	[repairLine]	r = 1 -> 0.125:(r' = 0);
+endmodule 
+
+
+module Line
+	line:[0..1] init 0;
+	line_n:[0..1] init 1;
+
+	[startLine]	line = 0&line_n=0 -> 1:(line' = 1);
+	[repairLine]	line = 1&line_n=0 -> 1:(line' = 0) & (line_n' = 1);
+	[]	line_n = 1 -> line_fail:(line_n' = 0);
+endmodule 
+
+
+module ToLeft
+	toleft:[0..1] init 0;
+	toleft_n:[0..1] init 1;
+
+	[startToleft]	toleft = 0&toleft_n=0 -> 1:(toleft' = 1);
+	[repairToleft]	toleft = 1&toleft_n=0 -> 1:(toleft' = 0) & (toleft_n' = 1);
+	[]	toleft_n = 1 -> switch_fail:(toleft_n' = 0);
+endmodule 
+
+
+module ToRight
+	toright:[0..1] init 0;
+	toright_n:[0..1] init 1;
+
+	[startToright]	toright = 0&toright_n=0 -> 1:(toright' = 1);
+	[repairToright]	toright = 1&toright_n=0 -> 1:(toright' = 0) & (toright_n' = 1);
+	[]	toright_n = 1 -> switch_fail:(toright_n' = 0);
+endmodule 
+
+rewards "time_not_min"
+	[] !minimum : 1;
+endrewards
+
+rewards "cost2"
+	[repairLeft] true :1;
+	[repairRight] true :1;
+	[repairToLeft] true :20*left_n;
+	[repairToRight] true :20*right_n;
+	[repairLine] true :50*( left_n+right_n );
+endrewards
+
+//const double ws_fail = %ws_fail;
+//const double ws_check = %ws_check;
+//const double ws_repair = %ws_repair;
+//const int i = %i;
+const double ws_fail;const double ws_check;const double ws_repair;const int i = 1;

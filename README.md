@@ -1,5 +1,5 @@
 # iCPD
-(*Interval Change Point Detection for Runtime Probabilistic Model Checking*, to appear in ASE2020)
+[Interval Change Point Detection for Runtime Probabilistic Model Checking](https://x-y-zhao.github.io/files/ASE2020.pdf), (to appear in ASE2020)
 
 ## Overview of iCPD
 We introduce iCPD as an online change-point detection (CPD) technique that tailored for runtime probabilistic model checking (PMC) applications using interval Markov models. It is essentially composed of two parts -- a robust Bayesian estimator on Markov model parameters and a Bayesian CPD procedure. The two Bayesian components are assembled in a loop with automatic trigger rules to invoke each other:
